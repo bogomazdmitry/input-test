@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QL Input Demo</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #f4f6fb, #eef2ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e4e7ef;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 24px 28px;
+      width: 360px;
+    }
+    .title {
+      margin: 0 0 12px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1f2a44;
+    }
+    .subtitle {
+      margin: 0 0 16px;
+      color: #53607a;
+      font-size: 14px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .stack {
+      position: relative;
+    }
+    .ghost-input {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      color: #9aa3b6;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .real-input {
+      position: relative;
+      z-index: 1;
+      background: transparent;
+    }
+    .input-base {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #d2d8e6;
+      font-size: 16px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .input-base:focus {
+      outline: none;
+      border-color: #5a6bff;
+      box-shadow: 0 0 0 4px rgba(90, 107, 255, 0.15);
+    }
+    .flag {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1f2a44;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title">QL Input Switcher</h1>
+    <p class="subtitle">Placeholder shifts when "/" appears; below shows if it starts with "/".</p>
+    <div id="root"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script>
+    const { useMemo, useState } = React;
+
+    const App = () => {
+      const [value, setValue] = useState('');
+
+      const startsWithSlash = value.startsWith('/');
+
+      const placeholder = useMemo(() => (
+        startsWithSlash ? '  QL lang' : 'No ql'
+      ), [startsWithSlash]);
+
+      const onlySlash = value === '/';
+      const showGhost = value.length === 0 || onlySlash;
+
+      return React.createElement(
+        'div',
+        { className: 'field' },
+        React.createElement(
+          'div',
+          { className: 'stack' },
+          showGhost && React.createElement('input', {
+            type: 'text',
+            className: 'ghost-input input-base',
+            value: placeholder,
+            tabIndex: -1,
+            'aria-hidden': true,
+            disabled: true,
+          }),
+          React.createElement('input', {
+            type: 'text',
+            className: 'real-input input-base',
+            value,
+            placeholder: '',
+            onChange: (e) => setValue(e.target.value),
+          })
+        ),
+        React.createElement('div', { className: 'flag' }, startsWithSlash ? 'true' : 'false')
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
